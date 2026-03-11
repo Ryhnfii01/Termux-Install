@@ -1,21 +1,28 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 clear
-echo "Roblox APK Installer"
-echo "Downloading APK..."
+echo "Roblox APK Auto Installer"
 
-pkg install wget -y > /dev/null 2>&1
+pkg install curl wget jq -y > /dev/null 2>&1
 
-wget -O roblox1.apk https://github.com/Ryhnfii01/RobloxAPK/releases/download/APK/Roniy.1-2.710.707.apk.apk
-wget -O roblox2.apk https://github.com/Ryhnfii01/RobloxAPK/releases/download/APK/Roniy.2-2.710.707.apk.apk
-wget -O roblox3.apk https://github.com/Ryhnfii01/RobloxAPK/releases/download/APK/Roniy.3-2.710.707.apk.apk
-wget -O roblox4.apk https://github.com/Ryhnfii01/RobloxAPK/releases/download/APK/Roniy.4-2.710.707.apk.apk
+REPO="Ryhnfii01/RobloxAPK"
+TAG="APK"
 
-echo "Installing..."
+echo "Mencari APK di GitHub Release..."
 
-pm install -r roblox1.apk
-pm install -r roblox2.apk
-pm install -r roblox3.apk
-pm install -r roblox4.apk
+APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
+ | jq -r '.assets[] | select(.name | endswith(".apk")) | .browser_download_url')
 
-echo "Install selesai!"
+echo "Downloading dan Installing..."
+
+for url in $APK_URLS; do
+    file=$(basename "$url")
+    
+    echo "Download $file"
+    wget -q --show-progress "$url"
+    
+    echo "Install $file"
+    pm install -r -d "$file"
+done
+
+echo "Selesai!"
