@@ -2,7 +2,7 @@
 
 clear
 echo "================================="
-echo " Roblox APK Auto Installer"
+echo " Roblox APK Root Installer"
 echo "================================="
 
 pkg update -y >/dev/null 2>&1
@@ -34,23 +34,18 @@ for url in $APK_URLS; do
 done
 
 echo ""
-echo "Installing APK..."
+echo "Installing APK (ROOT)..."
 
 for apk in "$DIR"/*.apk; do
     if [ -f "$apk" ]; then
         name=$(basename "$apk")
         echo "Install $name"
 
-        am start \
-        -a android.intent.action.VIEW \
-        -t application/vnd.android.package-archive \
-        -d "file://$apk"
-
-        sleep 3
+        su -c "pm install -r -d '$apk'"
     fi
 done
 
 echo ""
 echo "================================="
-echo " Semua APK siap diinstall"
+echo " Semua APK berhasil diinstall"
 echo "================================="
