@@ -11,25 +11,18 @@ pkg install curl wget -y >/dev/null 2>&1
 REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
 
-DIR="/sdcard/Download/APK"
+SD_DIR="/sdcard/Download/APK"
+TMP_DIR="/data/local/tmp"
 
-echo ""
-echo "Menyiapkan folder APK..."
-
-mkdir -p "$DIR"
+mkdir -p "$SD_DIR"
 
 echo "Menghapus APK lama..."
-rm -f "$DIR"/*.apk
+rm -f "$SD_DIR"/*.apk
 
 echo ""
 echo "Mencari semua APK di GitHub Release..."
 
 APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG | grep browser_download_url | grep ".apk" | cut -d '"' -f 4)
-
-if [ -z "$APK_URLS" ]; then
-    echo "Tidak ada APK ditemukan di release."
-    exit 1
-fi
 
 echo ""
 echo "Downloading APK..."
@@ -37,16 +30,18 @@ echo "Downloading APK..."
 for url in $APK_URLS; do
     file=$(basename "$url")
     echo "Downloading $file"
-    wget --show-progress -O "$DIR/$file" "$url"
+    wget --show-progress -O "$SD_DIR/$file" "$url"
 done
 
 echo ""
 echo "Installing APK..."
 
-for apk in "$DIR"/*.apk; do
+for apk in "$SD_DIR"/*.apk; do
     if [ -f "$apk" ]; then
-        echo "Install $(basename "$apk")"
-        pm install -r -d "$apk"
+        name=$(basename "$apk")
+        cp "$apk" "$TMP_DIR/$name"
+        echo "Install $name"
+        pm install -r -d -g "$TMP_DIR/$name"
     fi
 done
 
