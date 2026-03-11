@@ -10,7 +10,6 @@ pkg install curl wget -y >/dev/null 2>&1
 
 REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
-
 DIR="/sdcard/Download/APK"
 
 mkdir -p "$DIR"
@@ -18,10 +17,12 @@ mkdir -p "$DIR"
 echo ""
 echo "Mengambil daftar APK dari GitHub..."
 
-APK_LIST=($(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
+mapfile -t APK_LIST < <(
+curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
 | grep browser_download_url \
 | grep ".apk" \
-| cut -d '"' -f 4))
+| cut -d '"' -f 4
+)
 
 if [ ${#APK_LIST[@]} -eq 0 ]; then
     echo "Tidak ada APK ditemukan."
@@ -32,15 +33,13 @@ echo ""
 echo "APK yang tersedia:"
 echo "-------------------"
 
-i=1
-for url in "${APK_LIST[@]}"; do
-    name=$(basename "$url")
-    echo "$i) $name"
-    ((i++))
+for i in "${!APK_LIST[@]}"; do
+    name=$(basename "${APK_LIST[$i]}")
+    echo "$((i+1))) $name"
 done
 
 echo ""
-read -p "Masukkan nomor APK yang ingin diinstall (contoh: 1 3): " choices
+read -p "Masukkan nomor APK yang ingin diinstall (contoh: 1 atau 1 3): " choices
 
 echo ""
 echo "Menghapus APK lama..."
@@ -49,7 +48,14 @@ rm -f "$DIR"/*.apk
 echo ""
 
 for num in $choices; do
-    url=${APK_LIST[$((num-1))]}
+    index=$((num-1))
+
+    if [ -z "${APK_LIST[$index]}" ]; then
+        echo "Pilihan $num tidak valid"
+        continue
+    fi
+
+    url="${APK_LIST[$index]}"
     file=$(basename "$url")
 
     echo "Downloading $file"
