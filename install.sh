@@ -1,28 +1,46 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 clear
-echo "Roblox APK Auto Installer"
+echo "================================="
+echo " Roblox APK Auto Installer"
+echo "================================="
 
-pkg install curl wget jq -y > /dev/null 2>&1
+pkg update -y >/dev/null 2>&1
+pkg install curl wget -y >/dev/null 2>&1
 
 REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
 
-echo "Mencari APK di GitHub Release..."
+echo ""
+echo "Mencari semua APK di GitHub Release..."
 
 APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
- | jq -r '.assets[] | select(.name | endswith(".apk")) | .browser_download_url')
+| grep browser_download_url \
+| grep ".apk" \
+| cut -d '"' -f 4)
 
-echo "Downloading dan Installing..."
+echo ""
+echo "Download APK..."
 
-for url in $APK_URLS; do
+for url in $APK_URLS
+do
     file=$(basename "$url")
-    
-    echo "Download $file"
-    wget -q --show-progress "$url"
-    
-    echo "Install $file"
-    pm install -r -d "$file"
+    echo "Downloading $file"
+    wget -q --show-progress "$url" &
 done
 
-echo "Selesai!"
+wait
+
+echo ""
+echo "Installing APK..."
+
+for apk in *.apk
+do
+    echo "Install $apk"
+    pm install -r -d "$apk"
+done
+
+echo ""
+echo "================================="
+echo " Semua APK berhasil diinstall"
+echo "================================="
