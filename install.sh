@@ -13,11 +13,9 @@ TAG="APK"
 
 DIR="/sdcard/Download/APK"
 
-echo ""
-echo "Menyiapkan folder..."
-
 mkdir -p "$DIR"
 
+echo ""
 echo "Menghapus APK lama..."
 rm -f "$DIR"/*.apk
 
@@ -25,11 +23,6 @@ echo ""
 echo "Mencari semua APK di GitHub Release..."
 
 APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG | grep browser_download_url | grep ".apk" | cut -d '"' -f 4)
-
-if [ -z "$APK_URLS" ]; then
-    echo "Tidak ada APK ditemukan di release."
-    exit 1
-fi
 
 echo ""
 echo "Downloading APK..."
@@ -46,14 +39,18 @@ echo "Installing APK..."
 for apk in "$DIR"/*.apk; do
     if [ -f "$apk" ]; then
         name=$(basename "$apk")
-        size=$(stat -c%s "$apk")
-
         echo "Install $name"
-        cat "$apk" | pm install -r -d -S "$size"
+
+        am start \
+        -a android.intent.action.VIEW \
+        -t application/vnd.android.package-archive \
+        -d "file://$apk"
+
+        sleep 3
     fi
 done
 
 echo ""
 echo "================================="
-echo " Semua APK berhasil diinstall"
+echo " Semua APK siap diinstall"
 echo "================================="
