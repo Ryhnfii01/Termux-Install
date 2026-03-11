@@ -12,6 +12,11 @@ REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
 
 echo ""
+echo "Membersihkan file lama..."
+
+rm -f *.apk
+
+echo ""
 echo "Mencari semua APK di GitHub Release..."
 
 APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
@@ -20,16 +25,14 @@ APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG \
 | cut -d '"' -f 4)
 
 echo ""
-echo "Download APK..."
+echo "Downloading APK..."
 
 for url in $APK_URLS
 do
     file=$(basename "$url")
     echo "Downloading $file"
-    wget -q --show-progress "$url" &
+    wget -q --show-progress "$url"
 done
-
-wait
 
 echo ""
 echo "Installing APK..."
