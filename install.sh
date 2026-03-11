@@ -39,7 +39,7 @@ for i in "${!APK_LIST[@]}"; do
 done
 
 echo ""
-read -p "Masukkan nomor APK yang ingin diinstall (contoh: 1 atau 1 3): " choices
+read -p "Pilih APK (contoh: 1,2,3) atau tekan Enter untuk semua: " input
 
 echo ""
 echo "Menghapus APK lama..."
@@ -47,15 +47,24 @@ rm -f "$DIR"/*.apk
 
 echo ""
 
-for num in $choices; do
-    index=$((num-1))
+# jika user tekan enter → install semua
+if [ -z "$input" ]; then
+    selected=("${!APK_LIST[@]}")
+else
+    IFS=',' read -ra nums <<< "$input"
+    selected=()
+    for n in "${nums[@]}"; do
+        idx=$((n-1))
+        if [ -n "${APK_LIST[$idx]}" ]; then
+            selected+=("$idx")
+        else
+            echo "Pilihan $n tidak valid"
+        fi
+    done
+fi
 
-    if [ -z "${APK_LIST[$index]}" ]; then
-        echo "Pilihan $num tidak valid"
-        continue
-    fi
-
-    url="${APK_LIST[$index]}"
+for idx in "${selected[@]}"; do
+    url="${APK_LIST[$idx]}"
     file=$(basename "$url")
 
     echo "Downloading $file"
