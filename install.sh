@@ -5,6 +5,12 @@ echo "================================="
 echo " Roblox APK Auto Installer"
 echo "================================="
 
+# cek jika folder lama ada
+if [ -d "$HOME/Termux-Install" ]; then
+    echo "Folder lama ditemukan, menghapus..."
+    rm -rf "$HOME/Termux-Install"
+fi
+
 pkg update -y >/dev/null 2>&1
 pkg install curl wget -y >/dev/null 2>&1
 
@@ -12,8 +18,7 @@ REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
 
 echo ""
-echo "Membersihkan file lama..."
-
+echo "Membersihkan file APK lama..."
 rm -f *.apk
 
 echo ""
