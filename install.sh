@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 
 clear
 echo "================================="
@@ -23,18 +23,16 @@ APK_URLS=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG | grep 
 echo ""
 echo "Downloading APK..."
 
-for url in $APK_URLS
-do
+for url in $APK_URLS; do
     file=$(basename "$url")
     echo "Downloading $file"
-    wget "$url"
+    wget -q --show-progress "$url"
 done
 
 echo ""
 echo "Installing APK..."
 
-for apk in *.apk
-do
+for apk in *.apk; do
     echo "Install $apk"
     pm install -r -d "$apk"
 done
