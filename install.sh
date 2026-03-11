@@ -11,9 +11,15 @@ pkg install curl wget -y >/dev/null 2>&1
 REPO="Ryhnfii01/RobloxAPK"
 TAG="APK"
 
+DIR="/sdcard/Download/APK"
+
 echo ""
-echo "Membersihkan file lama..."
-rm -f *.apk
+echo "Menyiapkan folder APK..."
+
+mkdir -p "$DIR"
+
+echo "Menghapus APK lama..."
+rm -f "$DIR"/*.apk
 
 echo ""
 echo "Mencari semua APK di GitHub Release..."
@@ -31,15 +37,15 @@ echo "Downloading APK..."
 for url in $APK_URLS; do
     file=$(basename "$url")
     echo "Downloading $file"
-    wget --show-progress "$url"
+    wget --show-progress -O "$DIR/$file" "$url"
 done
 
 echo ""
 echo "Installing APK..."
 
-for apk in *.apk; do
+for apk in "$DIR"/*.apk; do
     if [ -f "$apk" ]; then
-        echo "Install $apk"
+        echo "Install $(basename "$apk")"
         pm install -r -d "$apk"
     fi
 done
