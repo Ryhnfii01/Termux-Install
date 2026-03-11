@@ -39,9 +39,12 @@ echo "Installing APK..."
 for apk in "$SD_DIR"/*.apk; do
     if [ -f "$apk" ]; then
         name=$(basename "$apk")
+
         cp "$apk" "$TMP_DIR/$name"
+        chmod 644 "$TMP_DIR/$name"
+
         echo "Install $name"
-        pm install -r -d -g "$TMP_DIR/$name"
+        cmd package install -r -d "$TMP_DIR/$name"
     fi
 done
 
